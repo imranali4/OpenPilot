@@ -22,7 +22,7 @@ MAX_USER_TORQUE = 500
 def compute_gb_accel(accel, speed):
   creep_brake = 0.0
   creep_speed = 4.0
-  creep_brake_value = 0.2
+  creep_brake_value = 0.3
   if speed < creep_speed:
     creep_brake = (creep_speed - speed) / creep_speed * creep_brake_value
   return float(accel) - creep_brake
@@ -65,7 +65,9 @@ class CarController:
       interceptor_gas_cmd = clip(pedal_command, 0., MAX_INTERCEPTOR_GAS)
     else:
       interceptor_gas_cmd = 0.
-    pcm_accel_cmd = clip(compute_gb_accel(actuators.accel), CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
+    pcm_accel_cmd = clip(compute_gb_accel(actuators.accel, CS.out.vEgo), CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
+    if not CC.longActive:
+      pcm_accel_cmd = 0
 
     # steer torque
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
